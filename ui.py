@@ -29,3 +29,7 @@ if image is not None:
     # Make the prediction (.predict() is the standard Keras method)
     prediction = cnn.predict(cleaned_image)
     st.write(f"Raw Prediction: {prediction}")
+    if(prediction>=0.5):
+        st.write("Model Prediction: Pneumonia")
+    else:
+        st.write("Model Prediction: Normal")
