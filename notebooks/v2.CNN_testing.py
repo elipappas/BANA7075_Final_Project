@@ -1,0 +1,56 @@
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+from sklearn.metrics import classification_report, confusion_matrix
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+from Image_Preparation import get_test_set
+
+
+MODEL_PATH = "xray_cnn_model.keras"
+CLASS_NAMES = ['NORMAL', 'PNEUMONIA']
+
+
+def main():
+    print("🔍 Loading model and evaluating on test set...\n")
+    
+    
+    model = load_model(MODEL_PATH)
+    print(f"✅ Model loaded from: {MODEL_PATH}")
+    
+   
+    test_generator = get_test_set()
+    
+   
+    print("Generating predictions on test set...")
+    predictions = model.predict(test_generator, verbose=1)
+    y_pred = (predictions > 0.5).astype(int).flatten()
+    y_true = test_generator.classes
+    
+    
+    print("\n📊 Test Set Evaluation:")
+    print(classification_report(y_true, y_pred, target_names=CLASS_NAMES))
+    
+   
+    cm = confusion_matrix(y_true, y_pred)
+    print("\nConfusion Matrix:")
+    print(cm)
+    
+  
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=CLASS_NAMES, yticklabels=CLASS_NAMES)
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.title('Confusion Matrix - Test Set')
+    plt.show()
+    
+    
+    accuracy = np.mean(y_pred == y_true)
+    print(f"\n✅ Overall Test Accuracy: {accuracy:.4f} ({accuracy*100:.2f}%)")
+
+
+if __name__ == "__main__":
+    main()
