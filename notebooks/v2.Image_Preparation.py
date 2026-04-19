@@ -2,11 +2,12 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from pathlib import Path
 
-DATA_DIR = Path("data")                    
+# ==================== CONFIGURATION ====================
+DATA_DIR = Path("data")
 IMAGE_SIZE = (224, 224)
 BATCH_SIZE = 32
 
-
+# Training data with augmentation
 train_datagen = ImageDataGenerator(
     rescale=1./255,
     rotation_range=10,
@@ -14,7 +15,7 @@ train_datagen = ImageDataGenerator(
     horizontal_flip=True
 )
 
-
+# Validation and Test (no augmentation)
 val_test_datagen = ImageDataGenerator(rescale=1./255)
 
 
@@ -24,7 +25,7 @@ def get_training_set():
         raise FileNotFoundError(
             f"❌ Training directory not found: {train_path}\n"
             f"Please download the Chest X-Ray Pneumonia dataset from Kaggle "
-            f"and place it under the '{DATA_DIR}' folder (see README.md for details)."
+            f"and place it under the 'data/' folder (see README.md)."
         )
     
     return train_datagen.flow_from_directory(
