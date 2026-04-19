@@ -1,0 +1,22 @@
+artifact_path: /home/arshia/Arshia/PR/BANA7075_Final_Project/notebooks/mlruns/1/models/m-dcc1136873ac4cf68168b458d7337583/artifacts
+flavors:
+  python_function:
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.tensorflow
+    python_version: 3.13.5
+  tensorflow:
+    code: null
+    data: data
+    keras_version: 2.21.0
+    model_type: keras
+    save_format: tf
+mlflow_version: 3.11.1
+model_id: m-dcc1136873ac4cf68168b458d7337583
+model_size_bytes: 286929918
+model_uuid: m-dcc1136873ac4cf68168b458d7337583
+prompts: null
+run_id: 6e7be93e60314a3c9f1687693d7f676f
+utc_time_created: '2026-04-18 17:20:19.545065'
