@@ -13,7 +13,7 @@ Pneumonia is a leading cause of death in children under 5 years old worldwide. H
 
 ---
 
-## Dataset
+## Dataset and Structure
 
 **Chest X-Ray Images (Pneumonia)** from [Kaggle], originally sourced from Guangzhou Women and Children's Medical Center.
 
@@ -103,7 +103,8 @@ pip install tensorflow streamlit pillow numpy mlflow scikit-learn matplotlib
 
 ---
 
-## Usage
+## Code Pipleine
+How to utilize our files to reproduce results:
 
 ### Train the model
 
@@ -140,6 +141,7 @@ Open `notebooks/cnn_mlflow_versioning.ipynb` to run both Adam and SGD experiment
 ---
 
 ## Roadmap
+Future expansion of this project incldudes:
 
 - [ ] Track full suite of metrics (F1, Recall, Precision) across runs
 - [ ] Experiment with additional model architectures (e.g., transfer learning)
@@ -153,10 +155,10 @@ Open `notebooks/cnn_mlflow_versioning.ipynb` to run both Adam and SGD experiment
 
 | Name | Role |
 |---|---|
-| Leah Domos | — |
-| Arshia Ghasemi | — |
-| Owen Montgomery | — |
-| Eli Pappas | — |
-| Emily Sullivan | — |
+| Leah Domos | Editor |
+| Arshia Ghasemi | Editor |
+| Owen Montgomery | Editor |
+| Eli Pappas | Editor |
+| Emily Sullivan | Editor |
 
 *BANA 7075 — Spring 2026*
