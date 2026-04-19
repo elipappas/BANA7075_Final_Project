@@ -1,0 +1,53 @@
+"""
+utils.py
+Shared image preprocessing utilities for inference.
+Imports IMAGE_SIZE from Image_Preparation.py to ensure perfect consistency
+with the training data generators.
+"""
+
+import numpy as np
+from PIL import Image
+from tensorflow.keras.preprocessing.image import img_to_array
+
+# Import shared configuration from the data pipeline
+from Image_Preparation import IMAGE_SIZE
+
+
+def prepare_image_for_model(image_input):
+    """
+    Preprocess a single image for model inference.
+    
+    Ensures identical preprocessing as the training pipeline in Image_Preparation.py:
+    - Convert to RGB
+    - Resize to IMAGE_SIZE
+    - Convert to numpy array
+    - Add batch dimension
+    - Normalize to [0, 1]
+    """
+    # Load the image if it's a path or file-like object (Streamlit upload)
+    if isinstance(image_input, (str, bytes)) or hasattr(image_input, 'read'):
+        img = Image.open(image_input)
+    elif isinstance(image_input, Image.Image):
+        img = image_input
+    else:
+        raise ValueError(
+            "Input must be a file path, file-like object, or PIL Image."
+        )
+
+    # Ensure exactly 3 color channels (RGB)
+    if img.mode != 'RGB':
+        img = img.convert('RGB')
+
+    # Resize using the shared IMAGE_SIZE
+    img = img.resize(IMAGE_SIZE)
+
+    # Convert PIL image to NumPy array
+    img_array = img_to_array(img)
+
+    # Expand dimensions to create batch of size 1
+    img_array = np.expand_dims(img_array, axis=0)
+
+    # Rescale pixel values to [0, 1]
+    img_array = img_array / 255.0
+
+    return img_array
