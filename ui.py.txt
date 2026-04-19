@@ -1,0 +1,49 @@
+import streamlit as st
+from tensorflow.keras.models import load_model
+from PIL import Image
+
+# Import preprocessing function
+from utils import prepare_image_for_model
+
+# ==================== CONFIGURATION ====================
+MODEL_PATH = "xray_cnn_model.keras"
+CLASS_NAMES = ['NORMAL', 'PNEUMONIA']
+
+
+@st.cache_resource
+def load_trained_model():
+    """Load the model once and cache it."""
+    return load_model(MODEL_PATH)
+
+
+def main():
+    st.title("🩺 Pneumonia Detection via CNN")
+    st.write("Upload a pediatric chest X-ray image to get a prediction.")
+
+    uploaded_file = st.file_uploader("Choose a chest X-ray image (JPG or PNG)", 
+                                     type=["jpg", "jpeg", "png"])
+
+    if uploaded_file is not None:
+        # Display uploaded image
+        image = Image.open(uploaded_file).convert('RGB')
+        st.image(image, caption="Uploaded Image", use_column_width=True)
+
+        # Preprocess and predict
+        processed_image = prepare_image_for_model(image)
+        model = load_trained_model()
+        prediction = model.predict(processed_image, verbose=0)[0][0]
+        
+        confidence = prediction if prediction > 0.5 else (1 - prediction)
+        predicted_class = CLASS_NAMES[1] if prediction > 0.5 else CLASS_NAMES[0]
+        
+        if predicted_class == "PNEUMONIA":
+            st.error(f"**Prediction: {predicted_class}**")
+        else:
+            st.success(f"**Prediction: {predicted_class}**")
+        
+        st.write(f"**Confidence:** {confidence:.2%}")
+        st.write(f"Raw probability (Pneumonia): {prediction:.4f}")
+
+
+if __name__ == "__main__":
+    main()
