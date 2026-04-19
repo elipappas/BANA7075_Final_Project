@@ -1,85 +1,75 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models
-import mlflow
-import mlflow.keras
-import os
+from Image_Preparation import get_training_set, get_validation_set
 
-
-from Image_Preparation import (
-    get_training_set,
-    get_validation_set,
-    get_test_set
-)
-
-
+# ==================== CONFIGURATION ====================
 EPOCHS = 5
-IMAGE_SIZE = (224, 224)
-BATCH_SIZE = 32
 MODEL_SAVE_PATH = "xray_cnn_model.keras"
 
-
+# Set random seed for reproducibility
 tf.random.set_seed(42)
 
 
-mlflow.set_experiment("Pneumonia_Detection_CNN")
-
 def build_model():
-    """Build the CNN model architecture."""
-    model = models.Sequential([
-        layers.Conv2D(32, (3, 3), activation='relu', input_shape=(*IMAGE_SIZE, 3)),
-        layers.MaxPooling2D((2, 2)),
-        layers.Flatten(),
-        layers.Dense(128, activation='relu'),
-        layers.Dropout(0.5),
-        layers.Dense(1, activation='sigmoid')
-    ])
-    
-    model.compile(
+    """Build and compile the CNN model."""
+    cnn = tf.keras.models.Sequential()
+
+    # First Convolution + Pooling
+    cnn.add(tf.keras.layers.Conv2D(
+        filters=32, 
+        kernel_size=3, 
+        activation='relu', 
+        input_shape=(224, 224, 3)
+    ))
+    cnn.add(tf.keras.layers.MaxPool2D(pool_size=2, strides=2))
+
+    # Flatten
+    cnn.add(tf.keras.layers.Flatten())
+
+    # Fully connected layers
+    cnn.add(tf.keras.layers.Dense(units=128, activation='relu'))
+
+    # Dropout to reduce overfitting
+    cnn.add(tf.keras.layers.Dropout(0.5))
+
+    # Output layer
+    cnn.add(tf.keras.layers.Dense(units=1, activation='sigmoid'))
+
+    # Compile the model
+    cnn.compile(
         optimizer='adam',
         loss='binary_crossentropy',
         metrics=['accuracy']
     )
-    return model
+    
+    return cnn
 
 
 def main():
     print("🚀 Starting Pneumonia Detection CNN Training...\n")
     
+    # Load data generators
+    training_set = get_training_set()
+    validation_set = get_validation_set()
     
-    train_generator = get_training_set()
-    val_generator = get_validation_set()
-    test_generator = get_test_set()
-    
-    
-    model = build_model()
+    # Build and train the model
+    cnn = build_model()
     
     print(f"Training model for {EPOCHS} epochs...")
     
-    with mlflow.start_run():
-        history = model.fit(
-            train_generator,
-            epochs=EPOCHS,
-            validation_data=val_generator,
-            verbose=1
-        )
-        
-        
-        mlflow.log_param("epochs", EPOCHS)
-        mlflow.log_param("batch_size", BATCH_SIZE)
-        mlflow.log_param("image_size", IMAGE_SIZE)
-        mlflow.log_metric("final_train_accuracy", history.history['accuracy'][-1])
-        mlflow.log_metric("final_val_accuracy", history.history['val_accuracy'][-1])
-        
-       
-        model.save(MODEL_SAVE_PATH)
-        print(f"✅ Model saved to: {MODEL_SAVE_PATH}")
-        
-     
-        mlflow.keras.log_model(model, "model")
+    history = cnn.fit(
+        training_set,
+        validation_data=validation_set,
+        epochs=EPOCHS,
+        verbose=1
+    )
     
-    print("\n🎉 Training completed successfully!")
-    print("You can now run CNN_testing.py to evaluate the model on the test set.")
-    print("Or run the Streamlit UI with: python -m streamlit run ui.py")
+    # Save the trained model
+    cnn.save(MODEL_SAVE_PATH)
+    print(f"✅ Model successfully saved to: {MODEL_SAVE_PATH}")
+    
+    print("\n🎉 Training completed!")
+    print("You can now evaluate the model using CNN_testing.py")
+    print("Or run the Streamlit UI with: streamlit run ui.py")
 
 
 if __name__ == "__main__":
